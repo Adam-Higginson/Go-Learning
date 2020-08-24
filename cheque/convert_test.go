@@ -1,7 +1,6 @@
 package cheque
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -79,6 +78,13 @@ func TestHandleGreaterThanTwenty(t *testing.T) {
 func TestHandleGreaterThanTwentyWithPence(t *testing.T) {
 	converted, err := ConvertToChequeFormat(2105)
 	var expected = "Twenty One Pounds And Five Pence"
+	assertNilError(t, err)
+	assertEquals(t, expected, converted)
+}
+
+func TestHandleWithPenceAndNoZero(t *testing.T) {
+	converted, err := ConvertToChequeFormat(630)
+	var expected = "Six Pounds And Thirty Pence"
 	assertNilError(t, err)
 	assertEquals(t, expected, converted)
 }
@@ -233,6 +239,14 @@ func TestExampleGivenInSlack(t *testing.T) {
 	assertEquals(t, expected, converted)
 }
 
+func TestHandleZeroCase(t *testing.T) {
+	converted, err := ConvertToChequeFormat(0)
+	var expected = "Zero Pounds And Zero Pence"
+	assertNilError(t, err)
+	assertEquals(t, expected, converted)
+
+}
+
 func assertNilError(t *testing.T, err error) {
 	if err != nil {
 		t.Errorf("Error was not nil!")
@@ -240,8 +254,6 @@ func assertNilError(t *testing.T, err error) {
 }
 
 func assertEquals(t *testing.T, expected, actual string) {
-	fmt.Println(actual)
-
 	if expected != actual {
 		t.Errorf("Converted was incorrect, got: %s, wanted: %s", actual, expected)
 	}
