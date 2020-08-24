@@ -56,12 +56,21 @@ func ConvertToChequeFormat(amountInPence int) (string, error) {
 func convertToChequeFormatRecurse(currentString string, amount int) string {
 	switch {
 	case amount < 20:
-		return calculatePoundUnits(currentString, amount)
+		return calculateUnits(currentString, amount)
 	case amount < 100:
 		return calculateTens(currentString, amount)
 	default:
 		return calculateHundredsAndGreater(currentString, amount)
 	}
+}
+
+func calculateUnits(currentString string, amount int) string {
+	//If the current string has been set and we have nothing left, we do not want to set zero
+	if currentString != "" && amount == 0 {
+		return currentString
+	}
+
+	return currentString + belowTwenty[amount] + " "
 }
 
 func calculateTens(currentString string, amount int) string {
@@ -80,6 +89,7 @@ func calculateHundredsAndGreater(currentString string, amount int) string {
 	return convertToChequeFormatRecurse(convertedToString, amount % divider)
 }
 
+
 func getFactorForAmount(amount int) (int, string) {
 	lengthOfNumber := int(math.Log10(float64(amount)) + 1)
 	switch {
@@ -94,16 +104,6 @@ func getFactorForAmount(amount int) (int, string) {
 	default:
 		return 1, "Unknown"
 	}
-}
-
-
-func calculatePoundUnits(currentString string, amount int) string {
-	//If the current string has been set and we have nothing left, we do not want to set zero
-	if currentString != "" && amount == 0 {
-		return currentString
-	}
-
-	return currentString + belowTwenty[amount] + " "
 }
 
 func getPoundsString(amount int) string {
