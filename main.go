@@ -1,55 +1,29 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/Adam-Higginson/test-go-project/cheque"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
+	"strconv"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		panic("No port specified!")
-	}
-
-	http.HandleFunc("/cheques", ChequesHandler)
-	log.Println("Starting server...")
-	log.Fatal(http.ListenAndServe(":" + port, nil))
-}
-type ChequeConversionRequest struct {
-	AmountInPence int `json:"amountInPence"`
-}
-
-type ChequeResponse struct {
-	AmountInPence int `json:"amountInPence"`
-	ChequeString string `json:"chequeString"`
-}
-
-func ChequesHandler(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
-	var chequeConversionRequest ChequeConversionRequest
-	err := json.Unmarshal(body, &chequeConversionRequest)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	args := os.Args[1:]
+	if len(args) != 1 {
+		fmt.Println("Expected one argument of amount in pence!")
 		return
 	}
 
-	amountInPence := chequeConversionRequest.AmountInPence
-	chequeString, err := cheque.ConvertToChequeFormat(amountInPence)
+	amount, err := strconv.ParseFloat(args[0], 64)
 	if err != nil {
-		log.Printf("Error when attempting to convert cheque amount, %v", err)
-		http.Error(w, "Error when attempting to convert cheque amount", http.StatusInternalServerError)
+		fmt.Printf("Error when parsing amount, %v\n", err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	chequeResponse := ChequeResponse{
-		AmountInPence: amountInPence,
-		ChequeString:  chequeString,
+	convertedAmount, err := cheque.ConvertToChequeFormatWithDecimal(amount)
+	if err != nil {
+		fmt.Printf("Error when converting to cheque format, %v\n", err)
 	}
 
-	json.NewEncoder(w).Encode(chequeResponse)
+	fmt.Printf("%s", convertedAmount)
 }
