@@ -244,12 +244,18 @@ func TestHandleZeroCase(t *testing.T) {
 	var expected = "Zero Pounds And Zero Pence"
 	assertNilError(t, err)
 	assertEquals(t, expected, converted)
+}
 
+func TestConvertWithDecimalAmount(t *testing.T) {
+	converted, err := ConvertToChequeFormatWithDecimal(135.73)
+	var expected = "One Hundred Thirty Five Pounds And Seventy Three Pence"
+	assertNilError(t, err)
+	assertEquals(t, expected, converted)
 }
 
 func assertNilError(t *testing.T, err error) {
 	if err != nil {
-		t.Errorf("Error was not nil!")
+		t.Errorf("Error was not nil! Error was: %v", err)
 	}
 }
 

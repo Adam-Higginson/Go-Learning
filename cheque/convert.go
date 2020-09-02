@@ -40,6 +40,10 @@ var belowHundred = map[int]string {
 	9 : "Ninety",
 }
 
+func ConvertToChequeFormatWithDecimal(amount float64) (string, error) {
+	return ConvertToChequeFormat(int((amount * 100) + 0.5))
+}
+
 func ConvertToChequeFormat(amountInPence int) (string, error) {
 	if amountInPence < 0 {
 		return "", errors.New("amount in pence is less than zero")
